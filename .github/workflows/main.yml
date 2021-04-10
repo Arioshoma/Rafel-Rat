@@ -1,12 +1,21 @@
-- name: Test Custom
-    uses: rjstone/discord-webhook-notify@v1
-    with:
-        severity: info
-        username: CustomUsername
-        color: '#ff00aa'
-        avatarUrl: https://github.githubassets.com/images/modules/logos_page/Octocat.png
-        description: This is a custom description.
-        details: 'Custom details: Somebody set up us the bomb.'
-        footer: This is a footer.
-        text: This is where text goes.
-        webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+name: Build
+on: [pull_request, push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Use Java8
+      uses: actions/setup-java@v1
+      with:
+          java-version: 1.8
+
+    - name: Build debug apk
+      run: sudo su && cd 'BlackMart' && chmod +x gradlew && ./gradlew clean assembleRelease
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v1
+      with:
+          name: app
+          path: "BlackMart/app/build/outputs/apk"
